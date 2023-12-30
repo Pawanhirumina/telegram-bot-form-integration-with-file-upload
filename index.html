@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Form</title>
+</head>
+<body>
+
+  <h1>Contact Form with File Upload</h1>
+
+  <form id="contactForm" enctype="multipart/form-data">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" required></textarea>
+
+      <label for="file">File:</label>
+      <input type="file" id="file" name="file">
+
+      <button type="button" onclick="submitForm()">Submit</button>
+  </form>
+
+  <script>
+      function submitForm() {
+          const BOT_TOKEN = 'YOUR_BOT_TOKEN';
+          const CHAT_ID = 'YOUR_CHAT_ID';
+
+          const name = document.getElementById('name').value;
+          const email = document.getElementById('email').value;
+          const message = document.getElementById('message').value;
+
+          const fileInput = document.getElementById('file');
+          const file = fileInput.files[0];
+
+          if (!file) {
+              alert('Please select a file');
+              return;
+          }
+
+          const apiUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`;
+
+          const formData = new FormData();
+          formData.append('chat_id', CHAT_ID);
+          formData.append('document', file);
+          formData.append('caption', `Name: ${name}\nEmail: ${email}\nMessage: ${message}`);
+
+          fetch(apiUrl, {
+              method: 'POST',
+              body: formData,
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log('Telegram API response:', data);
+              if (data.ok) {
+                  alert('Message and file sent successfully!');
+                  // Clear the form fields
+                  document.getElementById('name').value = '';
+                  document.getElementById('email').value = '';
+                  document.getElementById('message').value = '';
+                  document.getElementById('file').value = '';
+              } else {
+                  alert('Failed to send message and file. Please try again.');
+              }
+          })
+          .catch(error => {
+              console.error('Error sending message:', error);
+              alert('Failed to send message and file. Please try again.');
+          });
+      }
+  </script>
+
+  </body>
+</html>
